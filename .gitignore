@@ -1,0 +1,4 @@
+env
+.vscode
+**/__pycache__
+game_market/static/uploads

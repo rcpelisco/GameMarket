@@ -1,0 +1,11 @@
+{% extends "admin/master.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <h1>Items <small><a href="{{ url_for('admin.items.create') }}">
+      <button class="btn btn-primary btn-sm">Add item</button>
+    </a></small></h1>
+  </div>
+</div>
+{% endblock content %}

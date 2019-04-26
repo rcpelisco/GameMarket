@@ -1,0 +1,53 @@
+{% extends 'front_page/master.html' %}
+
+{% block jumbotron %}
+<section class="jumbotron text-center">
+    <div class="container">
+        <h1 class="jumbotron-heading">Dota 2 Items</h1>
+        <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+    </div>
+</section>
+{% endblock jumbotron %}
+
+{% block content %}
+<div class="album py-5 bg-light">
+    <div class="container">
+
+    <div class="row">
+        {% for item in items %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img src="{{ url_for('static', filename='uploads/img/') }}/{{ item.img_path }}" alt="" class="bd-placeholder-img card-img-top" width="100%" height="225" focusable="false" role="img" >
+                <div class="card-body">
+                <h5 class="card-title">{{ item.name }}</h5>
+                <hr>
+                <p class="card-text">
+                    {{ item.description|truncate(150) }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Add to cart</button>
+                    </div>
+                <small class="text-muted">Php {{ item.price }}</small>
+                </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+$(function() {
+    // $(".card-text").each(function(i){
+    //     len=$(this).text().length;
+    //     if(len>200) {
+    //         $(this).text($(this).text().substr(0,200)+'...');
+    //     }
+    // });
+})
+</script>
+{% endblock scripts %}
