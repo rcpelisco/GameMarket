@@ -1,0 +1,45 @@
+{% extends "admin/master.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Add Item</h3>
+                        <hr>
+                        <form action="{{ url_for('admin.items.update') }}" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="id" value="{{ item.id }}">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" id="name" 
+                                    class="form-control" placeholder="Name"
+                                    value="{{ item.name }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea name="description" id="description" class="form-control"
+                                    rows="5">{{ item.description }}</textarea>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="price">Price</label>
+                                    <input type="text" name="price" id="price" 
+                                        class="form-control" placeholder="Price"
+                                        value="{{ item.price }}">
+                                </div>
+                            </div>
+                            <input type="submit" value="Add Item" class="btn btn-primary pull-right">
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <img src="{{ url_for('static', filename='uploads/img') }}/{{ item.img_path }}" 
+                            alt="" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

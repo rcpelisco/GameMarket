@@ -31,12 +31,17 @@
         <header>
             <div class="navbar navbar-dark bg-dark align-items-center p-3 px-md-4 mb-3 border-bottom box-shadow">
                 <div class="container">
-                    <a href="#" class="mr-md-auto navbar-brand d-flex align-items-center">
+                    <a href="{{ url_for('front_page.index') }}" class="mr-md-auto navbar-brand d-flex align-items-center">
                         <strong>Game</strong> Market
                     </a>
                     <nav class="my-2 my-md-0 mr-md-3">
-                        <a class="p-2 text-light" href="#">Login</a>
-                        <a class="p-2 text-light" href="#">Register</a>
+                        {% if user == None %}
+                        <a class="p-2 text-light" href="{{ url_for('users.login') }}">Login</a>
+                        <a class="p-2 text-light" href="{{ url_for('users.register') }}">Register</a>
+                        {% else %}
+                        <span class="p-2 text-light"><strong>{{ user.name }}</strong></span>
+                        <a class="p-2 text-light" href="{{ url_for('admin.users.logout') }}">Logout</a>
+                        {% endif %}
                     </nav>
                 </div>
             </div>

@@ -10,43 +10,21 @@ def before_request():
     if 'user' in session:
         g.user = session['user']
 
-@users.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        credentials = {
-            'username': request.form['username'],
-            'password': request.form['password']
-        }
-
-        user = User(db).login(credentials)
-
-        if user:
-            session['user'] = user
-            g.user = user
-
-    if g.user:
-        return redirect(url_for('admin.items.index'))
-    return render_template('admin/login.html')
-
-@users.route('/register')
+@users.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        credentials = {
+        user_data = {
+            'name': request.form['name'],
+            'email': request.form['email'],
             'username': request.form['username'],
-            'password': request.form['password']
+            'password': request.form['password'],
+            'is_admin': 1,
         }
 
-        user = User(db).login(credentials)
-
-        if user:
-            session['user'] = user
-            g.user = user
-
-    if g.user:
-        users = Item(db).all() 
-        return render_template('admin/users/index.html', users=users)
-
-    return render_template('admin/register.html')
+        user = User(db, user_data)
+        user.save()
+        return redirect(url_for('users.login'))
+    return render_template('admin/register.html')        
     
 @users.route('/logout')
 def logout():

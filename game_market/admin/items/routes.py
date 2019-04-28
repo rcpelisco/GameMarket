@@ -18,7 +18,7 @@ def index():
     if g.user:
         items = Item(db).all()
         return render_template('admin/items/index.html', items=items)
-    return redirect(url_for('admin.users.login'))
+    return redirect(url_for('users.login'))
 
 @items.route('/create')
 def create():
@@ -56,7 +56,19 @@ def save():
 
 @items.route('/edit/<item>')
 def edit(item):
-    return render_template('admin/items/edit.html')
+    item = Item(db).get(item)
+    return render_template('admin/items/edit.html', item=item)
+
+@items.route('/update', methods=['POST'])
+def update():
+    item_data = {
+        'id': request.form['id'],
+        'name': request.form['name'],
+        'description': request.form['description'],
+        'price': request.form['price'],
+    }
+    item = Item(db).update(item_data)
+    return redirect(url_for('admin.items.view', item=item_data['id']))
 
 @items.route('/view/<item>')
 def view(item):

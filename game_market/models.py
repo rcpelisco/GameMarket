@@ -11,24 +11,19 @@ class User(object):
         self.name = user_data['name'] if not user_data == None else None
         self.password = user_data['password'] if not user_data == None else None
         self.created_at = None
+        self.is_admin = user_data['is_admin'] if not user_data == None else False
 
     def save(self):
         hashed = bcrypt.generate_password_hash(self.password).decode('utf-8')
 
-        query = '''INSERT INTO users (`username`, `email`, `password`, `name`)
-            values ("{}", "{}", "{}", "{}")'''.format(self.username, self.email, hashed, self.name)
+        query = '''INSERT INTO users (`username`, `email`, `password`, `name`, `is_admin`)
+            values ("{}", "{}", "{}", "{}", "{}")'''.format(self.username, self.email, 
+            hashed, self.name, self.is_admin)
         
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)
 
         self.mysql.connection.commit()
-
-        return {
-            'id': self.id,
-            'username': self.username,
-            'email': self.email,
-            'password': hashed
-        }
 
     def all(self):
         query = 'SELECT * users'
@@ -50,6 +45,28 @@ class User(object):
             return result
             
         return False
+    
+    def get_history(self, id):
+        query = '''
+        SELECT
+            `items`.`name`,
+            `transaction_history`.`action`,
+            `transaction_history`.`created_at`
+        FROM
+            `items`,
+            `users`,
+            `transaction_history`
+        WHERE
+            `transaction_history`.`item_id`=`items`.`id` AND
+            `transaction_history`.`user_id`=`users`.`id` AND
+            `transaction_history`.`user_id`={}
+        '''.format(id)
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
 
 class Item(object):
     def __init__(self, mysql, item_data=None):
@@ -67,6 +84,14 @@ class Item(object):
             VALUES ("{}", "{}", "{}", "{}")'''.format(self.name, self.description, 
             self.price, self.img_path)
         
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+
+        self.mysql.connection.commit()
+
+    def update(self, item_data):
+        query = 'UPDATE items SET `name`="{}", `description`="{}", `price`="{}" WHERE `id` = {}'.format(item_data['name'], item_data['description'], item_data['price'], item_data['id'])
+        print(query)
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)
 
@@ -97,4 +122,13 @@ class Item(object):
         cursor.execute(query)
 
         self.mysql.connection.commit()
-    
+
+    def add_to_cart(self, id, user_id):
+        query = 'INSERT INTO cart (`item_id`, `user_id`) VALUES ({}, {})'.format(id, user_id)
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+
+        self.mysql.connection.commit()
+
+        return id

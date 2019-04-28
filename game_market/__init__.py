@@ -21,8 +21,12 @@ from game_market.admin.routes import admin
 from game_market.admin.users.routes import users as admin_users
 from game_market.admin.items.routes import items as admin_items
 from game_market.front_page.routes import front_page
+from game_market.front_page.users.routes import users as front_page_users
+from game_market.front_page.items.routes import items as front_page_items
 
 app.register_blueprint(admin, url_prefix='/admin')
-app.register_blueprint(admin_users, url_prefix='/admin/users')
+app.register_blueprint(admin_users, url_prefix='/admin')
 app.register_blueprint(admin_items, url_prefix='/admin/items')
 app.register_blueprint(front_page, url_prefix='/')
+app.register_blueprint(front_page_users, url_prefix='/')
+app.register_blueprint(front_page_items, url_prefix='/items')
