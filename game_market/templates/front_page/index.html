@@ -14,6 +14,15 @@
     <div class="container">
 
     <div class="row">
+
+        {% if items|length < 1 %}
+        <div class="col-md-12">
+            <div class="div">
+                <h3>No items yet in the market.</h3>
+                <h4 class="lead">Please wait. Until further announcement regarding with the items. <br>Thank you for understanding.</h4>
+            </div>
+        </div>
+        {% else %}
         {% for item in items %}
         <div class="col-md-4">
             <div class="card mb-4 shadow-sm">
@@ -41,6 +50,7 @@
             </div>
         </div>
         {% endfor %}
+        {% endif %}
     </div>
 </div>
 
