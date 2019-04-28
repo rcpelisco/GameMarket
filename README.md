@@ -1,10 +1,11 @@
 # GameMarket
-===
 
 Installation
 -----
-Install required packages from .extra\requirements.txt using:
+Install required packages from requirements.txt using:
 
-    $ python -m pip install -r .\.extra\requirements.txt
+    $ python -m pip install -r .requirements.txt
 
 Create database 'game_market'
+
+Import sql located in sql/game_market.sql
