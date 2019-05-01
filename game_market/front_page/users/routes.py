@@ -9,6 +9,12 @@ def before_request():
     if 'user' in session:
         g.user = session['user']
 
+@users.route('/')
+def index():
+    if g.user == None:
+        print(g.user)
+        return redirect(url_for('front_page.index'))
+
 @users.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':

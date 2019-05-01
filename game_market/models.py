@@ -106,6 +106,15 @@ class Item(object):
 
         return result
 
+    def all_active(self):
+        query = 'SELECT * FROM get_all_active_items'
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
+
     def all(self):
         query = 'SELECT * FROM items'
 
