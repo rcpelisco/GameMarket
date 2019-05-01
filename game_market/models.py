@@ -35,13 +35,15 @@ class User(object):
         return result
 
     def login(self, cred):
-        query = 'SELECT * FROM users WHERE username="{}"'.format(cred['username'])
+        query = 'SELECT * FROM users WHERE username="{}"'.format(
+            cred['username'])
 
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)
         result = cursor.fetchone()
         
-        if result and bcrypt.check_password_hash(result['password'], cred['password']):
+        if result and bcrypt.check_password_hash(result['password'], 
+            cred['password']):
             return result
             
         return False
@@ -91,7 +93,7 @@ class Item(object):
 
     def update(self, item_data):
         query = 'UPDATE items SET `name`="{}", `description`="{}", `price`="{}" WHERE `id` = {}'.format(item_data['name'], item_data['description'], item_data['price'], item_data['id'])
-        print(query)
+        
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)
 
@@ -141,3 +143,97 @@ class Item(object):
         self.mysql.connection.commit()
 
         return id
+
+class Cart(object):
+    def __init__(self, mysql, item_data=None):
+        self.mysql = mysql
+        
+        self.id = 0
+        self.item_id = item_data['item_id'] if not item_data == None else None
+        self.user_id = item_data['user_id'] if not item_data == None else None
+        self.is_paid = item_data['is_paid'] if not item_data == None else None
+        self.created_at = None
+
+    def get_user_all_unpaid_items(self, id):
+        query = 'SELECT * FROM `get_user_all_unpaid_items` WHERE `user_id`={}'.format(id)
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
+
+    def get_user_all_paid_items(self, id):
+        query = 'SELECT * FROM `get_user_all_paid_items` WHERE `user_id`={}'.format(id)
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
+
+    def get(self, id):
+        query = 'SELECT * FROM cart WHERE id={}'.format(id)
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        return result
+
+    def all(self):
+        query = 'SELECT * FROM cart'
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
+        
+    def pay(self, id):
+        query = 'UPDATE cart SET `is_paid`=1 WHERE `id`={}'.format(id)
+        
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        
+        self.mysql.connection.commit()
+
+    def delete(self, id):
+        query = 'DELETE FROM cart WHERE `id` = {}'.format(id)
+        
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+
+        self.mysql.connection.commit()
+        
+class TransactionHistory(object):
+    def __init__(self, mysql):
+        self.mysql = mysql
+
+    def get_user_all(self, id):
+        query = 'SELECT * FROM `get_user_transaction_history` WHERE `user_id`={}'.format(id)
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
+
+    def get(self, id):
+        query = 'SELECT * FROM cart WHERE id={}'.format(id)
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        return result
+
+    def all(self):
+        query = 'SELECT * FROM cart'
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
+

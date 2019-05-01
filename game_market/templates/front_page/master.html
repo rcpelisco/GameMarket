@@ -8,7 +8,10 @@
         <title>Album example · Bootstrap</title>
 
         <link href="{{ url_for('static', filename='vendors/bootstrap/dist/css/bootstrap.min.css')}}" rel="stylesheet">
-        
+        <link href="{{ url_for('static', filename='vendors/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='vendors/simple-line-icons/css/simple-line-icons.css') }}" rel="stylesheet">
+        {% block stylesheets %}
+        {% endblock stylesheets %}
         <style>
             .bd-placeholder-img {
                 font-size: 1.125rem;
@@ -42,7 +45,7 @@
                                 <a class="nav-item nav-link" href="{{ url_for('users.login') }}">Login</a>
                                 <a class="nav-item nav-link" href="{{ url_for('users.register') }}">Register</a>
                                 {% else %}
-                                <a class="nav-item nav-link text-light" href="{{ url_for('users.index') }}"><strong>{{ user.name }}</strong></a>
+                                <a class="nav-item nav-link text-light" href="{{ url_for('users.account') }}"><strong>{{ user.name }}</strong></a>
                                 <a class="nav-item nav-link text-light" href="{{ url_for('admin.users.logout') }}">Logout</a>
                                 {% endif %}
                             </div>
@@ -58,9 +61,9 @@
             {% block content %}
             {% endblock content %}
         </main>
-        <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js')}}"></script>
-        <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.slim.min.js')}}"></script>
-        <script src="{{ url_for('static', filename='vendors/bootstrap/dist/js/bootstrap.bundle.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='vendors/popper.js/dist/umd/popper.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='vendors/bootstrap/dist/js/bootstrap.min.js') }}"></script>
         {% block scripts %}
         {% endblock scripts %}
     </body>

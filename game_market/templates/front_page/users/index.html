@@ -1,5 +1,104 @@
 {% extends 'front_page/master.html' %}
 
-{% block content %}
+{% block stylesheets %}
+<link href="{{ url_for('static', filename='vendors/dataTables/css/dataTables.min.css') }}" rel="stylesheet">
+{% endblock stylesheets %}
 
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h3>Cart</h3>
+                    <hr>
+                    <table class="table">
+                        <thead>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>
+                            {% for entry in cart %}
+                            <tr>
+                                <td>{{ entry['name'] }}</td>
+                                <td>Php {{ entry['price'] }}</td>
+                                <td>{{ entry['created_at'] }}</td>
+                                <td>
+                                    <a class="btn btn-sm btn-primary"
+                                        href="{{ url_for('items.pay', item=entry['id']) }}">
+                                        Pay
+                                    </a>
+                                    <a class="btn btn-sm btn-danger"
+                                        href="{{ url_for('items.delete', item=entry['id']) }}">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h3>Bought Items</h3>
+                    <hr>
+                    <table class="table">
+                        <thead>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Date</th>
+                        </thead>
+                        <tbody>
+                            {% for entry in bought_items %}
+                            <tr>
+                                <td>{{ entry['name'] }}</td>
+                                <td>Php {{ entry['price'] }}</td>
+                                <td>{{ entry['created_at'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h3>Transaction history</h3>
+                    <hr>
+                    <table class="table">
+                        <thead>
+                            <th>Action</th>
+                            <th>Date</th>
+                        </thead>
+                        <tbody>
+                            {% for entry in transaction_history %}
+                            <tr>
+                                <td>{{ entry['action'] }} {{ entry['name'] }} 
+                                    {% if(entry['action'] == 'Added') %}
+                                    to
+                                    {% elif(entry['action'] == 'Removed') %}
+                                    from
+                                    {% endif %}
+                                     cart</td>
+                                <td>{{ entry['created_at'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendors/dataTables/js/dataTables.min.js') }}"></script>
+<script>
+$(function() {
+    $('.table').DataTable()
+})
+</script>
+{% endblock scripts %}

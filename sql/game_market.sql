@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 01, 2019 at 07:56 AM
+-- Generation Time: May 01, 2019 at 11:51 AM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.3
 
@@ -40,7 +40,15 @@ CREATE TABLE `cart` (
 -- Triggers `cart`
 --
 DELIMITER $$
-CREATE TRIGGER `cart_transaction_history` AFTER INSERT ON `cart` FOR EACH ROW INSERT INTO transaction_history SET item_id = NEW.item_id, user_id = NEW.user_id, action='Added'
+CREATE TRIGGER `add_cart_transaction_history` AFTER INSERT ON `cart` FOR EACH ROW INSERT INTO transaction_history SET item_id = NEW.item_id, user_id = NEW.user_id, action='Added'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `pay_cart_transaction_history` AFTER UPDATE ON `cart` FOR EACH ROW INSERT INTO transaction_history SET item_id = OLD.item_id, user_id = OLD.user_id, action='Paid'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `remove_cart_transaction_history` AFTER DELETE ON `cart` FOR EACH ROW INSERT INTO transaction_history SET item_id = OLD.item_id, user_id = OLD.user_id, action='Removed'
 $$
 DELIMITER ;
 
@@ -63,32 +71,60 @@ CREATE TABLE `get_all_active_items` (
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `get_all_active_users`
+-- Stand-in structure for view `get_all_unpaid_items`
 -- (See below for the actual view)
 --
-CREATE TABLE `get_all_active_users` (
-`id` int(11)
-,`username` varchar(125)
-,`email` varchar(125)
-,`name` varchar(125)
-,`password` binary(60)
-,`is_admin` tinyint(1)
-,`created_at` datetime
-,`is_active` tinyint(1)
-);
-
--- --------------------------------------------------------
-
---
--- Stand-in structure for view `get_all_unpaid_from_cart`
--- (See below for the actual view)
---
-CREATE TABLE `get_all_unpaid_from_cart` (
+CREATE TABLE `get_all_unpaid_items` (
 `id` int(11)
 ,`item_id` int(11)
 ,`user_id` int(11)
 ,`is_paid` tinyint(1)
 ,`created_at` datetime
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `get_user_all_paid_items`
+-- (See below for the actual view)
+--
+CREATE TABLE `get_user_all_paid_items` (
+`id` int(11)
+,`user_id` int(11)
+,`item_id` int(11)
+,`name` varchar(125)
+,`price` double
+,`is_paid` tinyint(1)
+,`created_at` datetime
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `get_user_all_unpaid_items`
+-- (See below for the actual view)
+--
+CREATE TABLE `get_user_all_unpaid_items` (
+`id` int(11)
+,`user_id` int(11)
+,`item_id` int(11)
+,`name` varchar(125)
+,`price` double
+,`is_paid` tinyint(1)
+,`created_at` datetime
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `get_user_transaction_history`
+-- (See below for the actual view)
+--
+CREATE TABLE `get_user_transaction_history` (
+`user_id` int(11)
+,`action` varchar(256)
+,`created_at` datetime
+,`name` varchar(125)
 );
 
 -- --------------------------------------------------------
@@ -150,20 +186,38 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure for view `get_all_active_users`
+-- Structure for view `get_all_unpaid_items`
 --
-DROP TABLE IF EXISTS `get_all_active_users`;
+DROP TABLE IF EXISTS `get_all_unpaid_items`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_all_active_users`  AS  select `users`.`id` AS `id`,`users`.`username` AS `username`,`users`.`email` AS `email`,`users`.`name` AS `name`,`users`.`password` AS `password`,`users`.`is_admin` AS `is_admin`,`users`.`created_at` AS `created_at`,`users`.`is_active` AS `is_active` from `users` where (`users`.`is_active` = 1) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_all_unpaid_items`  AS  select `cart`.`id` AS `id`,`cart`.`item_id` AS `item_id`,`cart`.`user_id` AS `user_id`,`cart`.`is_paid` AS `is_paid`,`cart`.`created_at` AS `created_at` from `cart` where (`cart`.`is_paid` = 0) ;
 
 -- --------------------------------------------------------
 
 --
--- Structure for view `get_all_unpaid_from_cart`
+-- Structure for view `get_user_all_paid_items`
 --
-DROP TABLE IF EXISTS `get_all_unpaid_from_cart`;
+DROP TABLE IF EXISTS `get_user_all_paid_items`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_all_unpaid_from_cart`  AS  select `cart`.`id` AS `id`,`cart`.`item_id` AS `item_id`,`cart`.`user_id` AS `user_id`,`cart`.`is_paid` AS `is_paid`,`cart`.`created_at` AS `created_at` from `cart` where (`cart`.`is_paid` = 0) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_user_all_paid_items`  AS  select `cart`.`id` AS `id`,`users`.`id` AS `user_id`,`items`.`id` AS `item_id`,`items`.`name` AS `name`,`items`.`price` AS `price`,`cart`.`is_paid` AS `is_paid`,`cart`.`created_at` AS `created_at` from ((`cart` join `items`) join `users`) where ((`cart`.`user_id` = `users`.`id`) and (`items`.`id` = `cart`.`item_id`) and (`cart`.`is_paid` = 1)) ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `get_user_all_unpaid_items`
+--
+DROP TABLE IF EXISTS `get_user_all_unpaid_items`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_user_all_unpaid_items`  AS  select `cart`.`id` AS `id`,`users`.`id` AS `user_id`,`items`.`id` AS `item_id`,`items`.`name` AS `name`,`items`.`price` AS `price`,`cart`.`is_paid` AS `is_paid`,`cart`.`created_at` AS `created_at` from ((`cart` join `items`) join `users`) where ((`cart`.`user_id` = `users`.`id`) and (`items`.`id` = `cart`.`item_id`) and (`cart`.`is_paid` = 0)) ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `get_user_transaction_history`
+--
+DROP TABLE IF EXISTS `get_user_transaction_history`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_user_transaction_history`  AS  select `users`.`id` AS `user_id`,`transaction_history`.`action` AS `action`,`transaction_history`.`created_at` AS `created_at`,`items`.`name` AS `name` from ((`transaction_history` join `items`) join `users`) where ((`transaction_history`.`user_id` = `users`.`id`) and (`items`.`id` = `transaction_history`.`item_id`)) ;
 
 --
 -- Indexes for dumped tables
