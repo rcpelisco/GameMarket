@@ -73,7 +73,8 @@ def update():
 @items.route('/view/<item>')
 def view(item):
     item = Item(db).get(item)
-    return render_template('admin/items/view.html', item=item)
+    history = Item(db).get_history(item['id'])
+    return render_template('admin/items/view.html', item=item, history=history)
 
 @items.route('/delete/<item>')
 def delete(item):

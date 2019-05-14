@@ -108,6 +108,15 @@ class Item(object):
 
         return result
 
+    def get_history(self, id):
+        query = 'CALL SelectItemHistory({})'.format(id)
+
+        cursor = self.mysql.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
+
     def all_active(self):
         query = 'SELECT * FROM get_all_active_items'
 
@@ -135,7 +144,7 @@ class Item(object):
         self.mysql.connection.commit()
 
     def add_to_cart(self, id, user_id):
-        query = 'INSERT INTO cart (`item_id`, `user_id`) VALUES ({}, {})'.format(id, user_id)
+        query = 'CALL AddToCart({}, {})'.format(id, user_id)
 
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)
@@ -155,7 +164,7 @@ class Cart(object):
         self.created_at = None
 
     def get_user_all_unpaid_items(self, id):
-        query = 'SELECT * FROM `get_user_all_unpaid_items` WHERE `user_id`={}'.format(id)
+        query = 'CALL SelectUserUnpaidItems({})'.format(id)
 
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)
@@ -164,16 +173,16 @@ class Cart(object):
         return result
 
     def get_user_all_paid_items(self, id):
-        query = 'SELECT * FROM `get_user_all_paid_items` WHERE `user_id`={}'.format(id)
+        query = 'CALL SelectUserPaidItems({})'.format(id)
 
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)
         result = cursor.fetchall()
-
+        print(result)
         return result
 
     def get(self, id):
-        query = 'SELECT * FROM cart WHERE id={}'.format(id)
+        query = 'CALL SelectCart({})'.format(id)
 
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)
@@ -191,7 +200,7 @@ class Cart(object):
         return result
         
     def pay(self, id):
-        query = 'UPDATE cart SET `is_paid`=1 WHERE `id`={}'.format(id)
+        query = 'CALL PayItem({})'.format(id)
         
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)
@@ -211,7 +220,7 @@ class TransactionHistory(object):
         self.mysql = mysql
 
     def get_user_all(self, id):
-        query = 'SELECT * FROM `get_user_transaction_history` WHERE `user_id`={}'.format(id)
+        query = 'CALL SelectUserTransactionHistory({})'.format(id)
 
         cursor = self.mysql.connection.cursor()
         cursor.execute(query)

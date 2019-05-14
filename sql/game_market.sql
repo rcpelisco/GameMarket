@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 01, 2019 at 11:51 AM
+-- Generation Time: May 14, 2019 at 06:10 PM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.3
 
@@ -21,6 +21,46 @@ SET time_zone = "+00:00";
 --
 -- Database: `game_market`
 --
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddToCart` (IN `item_id` INT, IN `user_id` INT)  NO SQL
+INSERT INTO cart (`item_id`, `user_id`) VALUES (item_id, user_id)$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `PayItem` (IN `cart_id` INT)  BEGIN
+UPDATE cart SET is_paid=1 WHERE id=cart_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectCart` (IN `id` INT)  BEGIN
+    SELECT
+        *
+    FROM
+        cart
+    WHERE
+        id = id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectItemHistory` (IN `item_id` INT)  NO SQL
+SELECT * FROM item_edit_history WHERE item_id = item_id$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectUserPaidItems` (IN `id` INT)  BEGIN
+    SELECT
+        *
+    FROM
+        get_user_all_paid_items
+    WHERE
+        user_id = id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectUserTransactionHistory` (IN `user_id` INT)  NO SQL
+SELECT * FROM `get_user_transaction_history` WHERE `user_id`= user_id$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectUserUnpaidItems` (IN `user_id` INT)  NO SQL
+SELECT * FROM `get_user_all_unpaid_items` WHERE `user_id`= user_id$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -143,6 +183,33 @@ CREATE TABLE `items` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Triggers `items`
+--
+DELIMITER $$
+CREATE TRIGGER `add_item` AFTER INSERT ON `items` FOR EACH ROW INSERT INTO item_edit_history SET item_id = NEW.id, name = NEW.name, description = NEW.description, price=NEW.price
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `edit_item` AFTER UPDATE ON `items` FOR EACH ROW INSERT INTO item_edit_history SET item_id = NEW.id, name = NEW.name, description = NEW.description, price = NEW.price
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `item_edit_history`
+--
+
+CREATE TABLE `item_edit_history` (
+  `id` int(11) NOT NULL,
+  `name` varchar(125) NOT NULL,
+  `description` varchar(512) NOT NULL,
+  `price` double NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 -- --------------------------------------------------------
 
 --
@@ -238,6 +305,13 @@ ALTER TABLE `items`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `item_edit_history`
+--
+ALTER TABLE `item_edit_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `item_id` (`item_id`);
+
+--
 -- Indexes for table `transaction_history`
 --
 ALTER TABLE `transaction_history`
@@ -265,6 +339,12 @@ ALTER TABLE `cart`
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `item_edit_history`
+--
+ALTER TABLE `item_edit_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --

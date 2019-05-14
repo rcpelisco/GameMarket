@@ -1,5 +1,9 @@
 {% extends "admin/master.html" %}
 
+{% block stylesheets %}
+<link href="{{ url_for('static', filename='vendors/dataTables/css/dataTables.min.css') }}" rel="stylesheet">
+{% endblock stylesheets %}
+
 {% block content %}
 <div class="row">
     <div class="col-sm-6">
@@ -21,5 +25,40 @@
             </div>
         </div>
     </div>
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <h3>Edit History</h3>
+                <hr>
+                <table class="table">
+                    <thead>
+                        <th>Item</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Date</th>
+                    </thead>
+                    <tbody>
+                        {% for entry in history %}
+                        <tr>
+                            <td>{{ entry['name'] }}</td>
+                            <td>{{ entry['description'] }}</td>
+                            <td>Php {{ entry['price'] }}</td>
+                            <td>{{ entry['created_at'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock content %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendors/dataTables/js/dataTables.min.js') }}"></script>
+<script>
+$(function() {
+    $('.table').DataTable()
+})
+</script>
+{% endblock scripts %}
